@@ -2,37 +2,87 @@ package com.example.codepathwordle
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import org.w3c.dom.Text
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val restart_button = findViewById<Button>(R.id.restartButton);
-        var currentWord = FourLetterWordList.FourLetterWordList.getRandomFourLetterWord();
-        var userInput = findViewById<EditText>(R.id.guessText);
+        val submit_button = findViewById<Button>(R.id.submitButton)
+        val restart_button = findViewById<Button>(R.id.restartButton)
+        var currentWord = FourLetterWordList.FourLetterWordList.getRandomFourLetterWord()
+        var userInput = findViewById<EditText>(R.id.guessText)
+        var correct_ans = findViewById<TextView>(R.id.correctAnswer)
+
+        var listGuesses = listOf<TextView>(findViewById(R.id.guess1text), findViewById(R.id.guess2text), findViewById(R.id.guess3text))
+        var listResult = listOf<TextView>(findViewById(R.id.guessResult), findViewById(R.id.guessResult2), findViewById(R.id.guessResult3))
+
         var currentGuess = 1;
 
 
-       restart_button.setOnClickListener{
+
+
+        submit_button.setOnClickListener{
 
            if (currentGuess == 1) {
-               findViewById<TextView>(R.id.guess1text).text = userInput.text.toString()
-               findViewById<TextView>(R.id.guessResult).text = checkGuess(userInput.text.toString(), currentWord)
+               listGuesses[0].text = userInput.text.toString()
+               listResult[0].text = checkGuess(userInput.text.toString(), currentWord)
+               currentGuess++
            }else if (currentGuess == 2) {
-               findViewById<TextView>(R.id.guess2text).text = userInput.text.toString()
-               findViewById<TextView>(R.id.guessResult2).text = checkGuess(userInput.text.toString(), currentWord)
+               listGuesses[1].text = userInput.text.toString()
+               listResult[1].text = checkGuess(userInput.text.toString(), currentWord)
+               currentGuess++
            }else if (currentGuess == 3) {
-               findViewById<TextView>(R.id.guess3text).text = userInput.text.toString()
-               findViewById<TextView>(R.id.guessResult3).text = checkGuess(userInput.text.toString(), currentWord)
-           }else {
-               Toast.makeText(it.context, "Over the limit bruv", Toast.LENGTH_SHORT).show();
+               listGuesses[2].text = userInput.text.toString()
+               listResult[2].text = checkGuess(userInput.text.toString(), currentWord)
+
+               if (listResult[2].text == "OOOO") {
+                   Toast.makeText(
+                       it.context,
+                       "Correct answer!",
+                       Toast.LENGTH_SHORT
+                   ).show()
+
+               } else {
+                   Toast.makeText(
+                       it.context,
+                       "You have exceeded the maximum number of guesses!",
+                       Toast.LENGTH_SHORT
+                   ).show()
+               }
+
+               correct_ans.text = currentWord
+               correct_ans.visibility = View.VISIBLE
+
+               submit_button.isEnabled = false
+               restart_button.visibility = View.VISIBLE
+
+               restart_button.setOnClickListener{
+                   currentWord = FourLetterWordList.FourLetterWordList.getRandomFourLetterWord()
+                   currentGuess = 1
+
+                   for (guess in listGuesses) {
+                       guess.text = ""
+                   }
+
+                   for (result in listResult) {
+                       result.text = ""
+                   }
+
+                   restart_button.visibility = View.INVISIBLE
+                   correct_ans.visibility = View.INVISIBLE
+                   submit_button.isEnabled = true
+
+               }
+
+
            }
-           currentGuess++;
        }
 
 
